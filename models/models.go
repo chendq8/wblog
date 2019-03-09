@@ -35,7 +35,7 @@ type Page struct {
 type Post struct {
 	BaseModel
 	Title        string     // title
-	Body         string     // body
+	Body         string     `sql:"type:text;"`//---指定映射成text类型
 	View         int        // view count
 	IsPublished  bool       // published or not
 	Tags         []*Tag     `gorm:"-"` // tags of post
@@ -132,9 +132,11 @@ var DB *gorm.DB
 
 func InitDB() (*gorm.DB, error) {
 
-	db, err := gorm.Open("sqlite3", system.GetConfiguration().DSN)
+	//db, err := gorm.Open("sqlite3", system.GetConfiguration().DSN)
+	db, err := gorm.Open("mysql", system.GetConfiguration().DSN)
 	//db, err := gorm.Open("mysql", "root:mysql@/wblog?charset=utf8&parseTime=True&loc=Asia/Shanghai")
-	if err == nil {
+	db.Set("gorm:table_options", "CHARSET=utf8mb4").AutoMigrate(&Page{}, &Post{}, &Tag{}, &PostTag{}, &User{}, &Comment{}, &Subscriber{}, &Link{})
+        if err == nil {
 		DB = db
 		//db.LogMode(true)
 		db.AutoMigrate(&Page{}, &Post{}, &Tag{}, &PostTag{}, &User{}, &Comment{}, &Subscriber{}, &Link{}, &SmmsFile{})
